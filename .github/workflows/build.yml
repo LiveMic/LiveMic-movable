@@ -1,0 +1,33 @@
+name: Build LIVE_MIC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Extract source
+      run: tar -xf LIVE_MIC_source.zip
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Build EXE
+      run: |
+        cd LIVE_MIC
+        dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+
+    - name: Copy EXE
+      run: copy LIVE_MIC\bin\Release\net8.0-windows\win-x64\publish\LIVE_MIC.exe LIVE_MIC.exe
+
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: LIVE_MIC_EXE
+        path: LIVE_MIC.exe
